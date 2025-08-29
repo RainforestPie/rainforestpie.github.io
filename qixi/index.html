@@ -2,21 +2,25 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="format-detection" content="telephone=no,email=no,address=no" />
   <title>七夕猜数字 · 1~100</title>
-  <meta name="description" content="一个外观清爽、可自定义背景图的 1~100 猜数字小游戏（七夕版），适合部署在 GitHub Pages/Hexo/Jekyll 上。" />
+  <meta name="description" content="一个外观清爽、可自定义背景图的 1~100 猜数字小游戏（七夕版），移动端微信适配优化。" />
   <style>
     :root{
       --fg:#f7f7f8; --muted:#c7c9d3; --bg:#0b0f1a; --glass:rgba(255,255,255,.07);
       --pink:#ff7bb4; --blue:#7bdfff; --gold:#ffd166; --danger:#ff6b6b; --ok:#7be27b;
-      --bg-img:""; /* 你可以通过 JS/设置面板/URL 参数 ?bg= 来设置 */
+      --vh: 1vh; /* 动态视口单位，JS 会覆盖 */
     }
     html,body{height:100%;}
     body{
       margin:0; color:var(--fg); font-family: system-ui, -apple-system, Segoe UI, Roboto, Noto Sans SC, Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
       background: radial-gradient(120vw 80vh at 50% -10%, #1b2444 0%, var(--bg) 45%, #02050b 100%);
-      overflow:hidden; position:relative;
+      overflow:hidden; position:relative; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; touch-action:manipulation;
     }
+    /* 用动态视口高度，解决 iOS/微信 100vh 适配问题 */
+    .viewport{position:relative; width:100vw; height:calc(var(--vh) * 100);}
+
     /* 背景图层（可配置） */
     .bg-img{position:absolute; inset:0; background-size:cover; background-position:center; filter:brightness(.8) saturate(1.1); opacity:.35;}
     .bg-overlay{position:absolute; inset:0; background:radial-gradient(120vw 80vh at 50% -10%, rgba(27,36,68,.7), rgba(2,5,11,.92) 60%);} 
@@ -26,11 +30,11 @@
     .stars i{position:absolute; border-radius:50%; background:#fff; opacity:.7; animation: twinkle 3s infinite ease-in-out alternate;}
     @keyframes twinkle{ from{ opacity:.3; transform:scale(.8) } to{ opacity:1; transform:scale(1) } }
 
-    /* 容器 */
-    .wrap{position:relative; width:100vw; height:100vh; display:grid; place-items:center;}
+    /* 居中容器 */
+    .game-wrap{position:relative; width:100%; height:100%; display:grid; place-items:center; padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(calc(12px + env(safe-area-inset-bottom)), 12px) max(12px, env(safe-area-inset-left)); box-sizing:border-box;}
 
-    .card{width:min(640px, 92vw); background:rgba(16, 22, 41, .72); border:1px solid rgba(255,255,255,.12); border-radius:18px; padding:20px 18px; box-shadow:0 10px 40px rgba(0,0,0,.35);}
-    h1{margin:.3rem 0 .2rem; font-size: clamp(28px, 4vw, 40px); letter-spacing:.5px}
+    .card{width:min(640px, 92vw); background:rgba(16, 22, 41, .72); border:1px solid rgba(255,255,255,.12); border-radius:18px; padding:20px 18px; box-shadow:0 10px 40px rgba(0,0,0,.35); backdrop-filter: blur(8px);} 
+    h1{margin:.3rem 0 .2rem; font-size: clamp(26px, 5vw, 40px); letter-spacing:.5px}
     .sub{margin:0 0 10px; color:var(--muted)}
 
     .row{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
@@ -40,14 +44,18 @@
 
     .field{display:flex; align-items:center; gap:8px}
     .input{flex:1; display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); border-radius:12px; padding:10px 12px}
-    .input input{flex:1; border:none; outline:none; background:transparent; color:var(--fg); font-size:18px}
-    .btn{background:linear-gradient(90deg, var(--pink), var(--blue)); color:#161a2a; font-weight:700; border:none; padding:11px 14px; border-radius:12px; cursor:pointer; box-shadow:0 4px 20px rgba(255,123,180,.25);}
+    .input input{flex:1; border:none; outline:none; background:transparent; color:var(--fg); font-size:18px; -webkit-appearance:none; appearance:textfield}
+    /* 去掉 iOS number 输入箭头 */
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button{ -webkit-appearance: none; margin: 0; }
+
+    .btn{background:linear-gradient(90deg, var(--pink), var(--blue)); color:#161a2a; font-weight:700; border:none; padding:11px 14px; border-radius:12px; cursor:pointer; box-shadow:0 4px 20px rgba(255,123,180,.25);} 
     .btn:active{transform:translateY(1px)}
     .btn.alt{background:var(--glass); color:var(--fg); border:1px solid rgba(255,255,255,.12); box-shadow:none}
 
     .status{margin:10px 0 6px; min-height:26px; font-size:16px}
     .status b{font-weight:800}
-    .history{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px}
+    .history{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; max-height:22vh; overflow:auto;}
     .tag{padding:4px 8px; border-radius:999px; font-size:13px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1)}
 
     .rangeBar{height:10px; background:linear-gradient(90deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); border:1px solid rgba(255,255,255,.08); border-radius:999px; overflow:hidden; margin:10px 0 2px}
@@ -59,114 +67,131 @@
     .right{display:flex; gap:8px}
 
     /* 获胜浮层 */
-    .overlay{position:fixed; inset:0; display:none; place-items:center;}
+    .overlay{position:fixed; inset:0; height:calc(var(--vh) * 100); display:none; place-items:center; padding: env(safe-area-inset-top) env(safe-area-inset-right) calc( env(safe-area-inset-bottom) + 12px ) env(safe-area-inset-left);} 
     .panel{width:min(560px, 90vw); text-align:center; background:rgba(16,22,41,.85); border:1px solid rgba(255,255,255,.12); border-radius:18px; padding:20px; box-shadow:0 12px 50px rgba(0,0,0,.5)}
     .score{font-size:34px; font-weight:900}
     .poem{margin:8px auto 0; font-size:16px; color:#ffe5f1}
     .author{color:#f9f9f9a6; font-size:14px; margin-top:4px}
 
     /* 爱心烟花 */
-    .hearts{position:fixed; inset:0; pointer-events:none; overflow:hidden}
+    .hearts{position:fixed; inset:0; height:calc(var(--vh) * 100); pointer-events:none; overflow:hidden}
     .hearts .h{position:absolute; width:14px; height:14px; transform:translate(-50%,-50%) rotate(45deg); animation:float 2.2s linear forwards;}
     .hearts .h::before,.hearts .h::after{content:""; position:absolute; width:14px; height:14px; background:inherit; border-radius:50%}
     .hearts .h::before{left:-7px}
     .hearts .h::after{top:-7px}
     @keyframes float{0%{opacity:0; transform:translate(-50%,-50%) scale(.8) rotate(45deg)} 10%{opacity:1} 100%{opacity:0; transform:translate(-50%, -180%) scale(1.8) rotate(45deg)}}
 
-    /* 设置弹窗 */
-    dialog{background:rgba(16,22,41,.9); border:1px solid rgba(255,255,255,.12); color:var(--fg); border-radius:16px; padding:14px 16px}
-    dialog::backdrop{background:rgba(0,0,0,.5)}
+    /* 自定义设置弹窗（替代 <dialog>，兼容微信） */
+    .modal{position:fixed; inset:0; height:calc(var(--vh) * 100); display:none; place-items:center; background:rgba(0,0,0,.5);}
+    .modal .m-panel{width:min(520px, 90vw); background:rgba(16,22,41,.9); border:1px solid rgba(255,255,255,.12); color:var(--fg); border-radius:16px; padding:14px 16px}
     .cfg-row{display:flex; gap:8px; align-items:center; margin:8px 0}
-    .cfg-row input{flex:1; padding:8px 10px; border-radius:10px; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.06); color:var(--fg)}
+    .cfg-row input{flex:1; padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.06); color:var(--fg); font-size:16px}
     .hint{color:var(--muted); font-size:12px}
 
     @media (max-width:480px){ .right{width:100%} }
   </style>
 </head>
 <body>
-  <div class="bg-img" id="bgImg"></div>
-  <div class="bg-overlay"></div>
-  <div class="stars" id="stars"></div>
+  <div class="viewport">
+    <div class="bg-img" id="bgImg"></div>
+    <div class="bg-overlay"></div>
+    <div class="stars" id="stars"></div>
 
-  <div class="wrap">
-    <div class="card">
-      <h1>七夕猜数字 <span style="font-size:20px">· 1~100</span></h1>
-      <p class="sub">我心有数，你来猜猜？输入 <b>1~100</b> 的整数并提交，我会提示 <b>↑ 更大 / ↓ 更小</b>。猜对后会送上七夕爱情诗句或英文情话～</p>
+    <div class="game-wrap">
+      <div class="card">
+        <h1>七夕猜数字 <span style="font-size:20px">· 1~100</span></h1>
+        <p class="sub">我心有数，你来猜猜？输入 <b>1~100</b> 的整数并提交，我会提示 <b>↑ 更大 / ↓ 更小</b>。猜对后会送上七夕爱情诗句或英文情话～</p>
 
-      <div class="hud">
-        <span class="chip">🎯 范围：<b id="rangeText">1 - 100</b></span>
-        <span class="chip">📝 次数：<b id="tries">0</b></span>
-        <span class="chip">🏆 最佳：<b id="best">-</b></span>
-      </div>
-
-      <div class="field">
-        <div class="input">
-          <span>🔢</span>
-          <input id="num" type="number" placeholder="输入 1~100" min="1" max="100" />
+        <div class="hud">
+          <span class="chip">🎯 范围：<b id="rangeText">1 - 100</b></span>
+          <span class="chip">📝 次数：<b id="tries">0</b></span>
+          <span class="chip">🏆 最佳：<b id="best">-</b></span>
         </div>
-        <button class="btn" id="btnGuess">猜！</button>
-        <button class="btn alt" id="btnNew">新局</button>
-      </div>
 
-      <div class="status" id="status"></div>
-
-      <div class="rangeBar"><i id="rangeBar"></i></div>
-      <div class="rangeLabel">当前可能区间会随着你的判断逐渐缩小</div>
-
-      <div class="history" id="history"></div>
-
-      <div class="footer">
-        <div class="left">
-          <button class="btn alt" id="btnSettings">⚙️ 设置</button>
-          <button class="btn alt" id="btnShare">🔗 分享</button>
+        <div class="field">
+          <div class="input">
+            <span>🔢</span>
+            <input id="num" inputmode="numeric" pattern="[0-9]*" type="number" placeholder="输入 1~100" min="1" max="100" />
+          </div>
+          <button class="btn" id="btnGuess">猜！</button>
+          <button class="btn alt" id="btnNew">新局</button>
         </div>
-        <div class="right">
-          <a class="btn alt" href="/" style="text-decoration:none">返回首页</a>
+
+        <div class="status" id="status"></div>
+
+        <div class="rangeBar"><i id="rangeBar"></i></div>
+        <div class="rangeLabel">当前可能区间会随着你的判断逐渐缩小</div>
+
+        <div class="history" id="history"></div>
+
+        <div class="footer">
+          <div class="left">
+            <button class="btn alt" id="btnSettings">⚙️ 设置</button>
+            <button class="btn alt" id="btnShare">🔗 分享</button>
+          </div>
+          <div class="right">
+            <a class="btn alt" href="/" style="text-decoration:none">返回首页</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 获胜浮层 -->
+    <div class="overlay" id="overlay">
+      <div class="panel">
+        <div class="score" id="final">🎉 你用了 0 次猜中！</div>
+        <div class="poem" id="poem">两情若是久长时，又岂在朝朝暮暮。</div>
+        <div class="author" id="author">— 秦观《鹊桥仙》</div>
+        <div class="row" style="justify-content:center; margin-top:10px">
+          <button class="btn" id="again">再来一局</button>
+          <button class="btn alt" id="copy">复制文案</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="hearts" id="hearts"></div>
+
+    <!-- 自定义设置弹窗（兼容微信） -->
+    <div class="modal" id="cfg">
+      <div class="m-panel">
+        <h3 style="margin:0 0 6px">外观设置</h3>
+        <div class="cfg-row">
+          <label style="min-width:4em">背景图</label>
+          <input id="bgInput" placeholder="输入图片 URL（建议 https）" />
+        </div>
+        <div class="hint">可在地址后加参数 <code>?bg=图片URL</code>，或在此处设置。会自动保存到本地。</div>
+        <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px">
+          <button class="btn alt" id="clearBg">清除</button>
+          <button class="btn" id="saveBg">保存</button>
         </div>
       </div>
     </div>
   </div>
-
-  <!-- 获胜浮层 -->
-  <div class="overlay" id="overlay">
-    <div class="panel">
-      <div class="score" id="final">🎉 你用了 0 次猜中！</div>
-      <div class="poem" id="poem">两情若是久长时，又岂在朝朝暮暮。</div>
-      <div class="author" id="author">— 秦观《鹊桥仙》</div>
-      <div class="row" style="justify-content:center; margin-top:10px">
-        <button class="btn" id="again">再来一局</button>
-        <button class="btn alt" id="copy">复制文案</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="hearts" id="hearts"></div>
-
-  <!-- 设置弹窗 -->
-  <dialog id="cfg">
-    <h3 style="margin:0 0 6px">外观设置</h3>
-    <div class="cfg-row">
-      <label style="min-width:4em">背景图</label>
-      <input id="bgInput" placeholder="输入图片 URL（建议 https）" />
-    </div>
-    <div class="hint">可在地址后加参数 <code>?bg=图片URL</code>，或在此处设置。会自动保存到本地。</div>
-    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px">
-      <button class="btn alt" id="clearBg">清除</button>
-      <button class="btn" id="saveBg">保存</button>
-    </div>
-  </dialog>
 
   <script>
+    // ============ 视口修复：动态 --vh = visualViewport.height/100 ============
+    (function fixVH(){
+      const setVh = ()=>{
+        const h = (window.visualViewport? visualViewport.height : window.innerHeight) * 0.01;
+        document.documentElement.style.setProperty('--vh', h + 'px');
+      };
+      setVh();
+      window.addEventListener('resize', setVh, {passive:true});
+      window.addEventListener('orientationchange', setVh, {passive:true});
+      if(window.visualViewport){ visualViewport.addEventListener('resize', setVh, {passive:true}); }
+    })();
+
     // ============ 小工具 ============
     const $ = sel => document.querySelector(sel);
     const $$ = sel => document.querySelectorAll(sel);
     const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
     const qs = new URLSearchParams(location.search);
 
-    // ============ 星点生成 ============
-    (function starfield(){
-      const box = $('#stars');
-      const n = 120; const W = window.innerWidth; const H = window.innerHeight;
+    // ============ 星点生成（随窗口变化重建） ============
+    function buildStars(){
+      const box = $('#stars'); box.innerHTML = '';
+      const area = window.innerWidth * (window.visualViewport? visualViewport.height: window.innerHeight);
+      const n = Math.min(160, Math.max(90, Math.floor(area/18000)));
       for(let i=0;i<n;i++){
         const s = document.createElement('i');
         const size = Math.random()*2.2 + .6;
@@ -177,7 +202,9 @@
         s.style.animationDuration = (2.5+Math.random()*3)+'s';
         box.appendChild(s);
       }
-    })();
+    }
+    buildStars();
+    window.addEventListener('resize', buildStars, {passive:true});
 
     // ============ 背景图设置 ============
     const bgKey = 'guess_bg_url';
@@ -233,7 +260,8 @@
       dom.rangeBar.style.background = `linear-gradient(90deg, transparent 0%, transparent 0%, rgba(255,255,255,.22) 0%, rgba(255,255,255,.22) 100%, transparent 100%)`;
       dom.history.innerHTML = '';
       hideOverlay();
-      dom.num.focus();
+      // iOS 微信键盘弹出会改变 viewport，高度已用 --vh 适配，这里聚焦不再强制滚动
+      setTimeout(()=> dom.num.focus({preventScroll:true}), 0);
     }
 
     function updateRangeBar(){
@@ -286,8 +314,8 @@
       boomHearts(26);
     }
 
-    function showOverlay(){ dom.overlay.style.display = 'grid'; }
-    function hideOverlay(){ dom.overlay.style.display = 'none'; }
+    function showOverlay(){ $('#overlay').style.display = 'grid'; }
+    function hideOverlay(){ $('#overlay').style.display = 'none'; }
 
     // ============ 爱心动画 ============
     function boomHearts(n=20){
@@ -309,7 +337,7 @@
     $('#btnNew').addEventListener('click', newGame);
     $('#again').addEventListener('click', ()=>{ newGame(); hideOverlay(); });
     $('#copy').addEventListener('click', ()=>{
-      const txt = `${dom.final.textContent}\n${dom.poem.textContent}\n${dom.author.textContent}`;
+      const txt = `${$('#final').textContent}\n${$('#poem').textContent}\n${$('#author').textContent}`;
       navigator.clipboard?.writeText(txt); alert('已复制，快去分享吧！');
     });
     $('#btnShare').addEventListener('click', ()=>{
@@ -322,16 +350,20 @@
     // 回车提交
     $('#num').addEventListener('keydown', e=>{ if(e.key==='Enter') guess(); });
 
-    // 设置面板
-    const cfg = $('#cfg');
-    $('#btnSettings').addEventListener('click', ()=> cfg.showModal());
-    $('#saveBg').addEventListener('click', ()=>{ const v = $('#bgInput').value.trim(); localStorage.setItem(bgKey, v); applyBg(v); cfg.close();});
-    $('#clearBg').addEventListener('click', ()=>{ localStorage.removeItem(bgKey); applyBg(''); $('#bgInput').value=''; cfg.close(); });
+    // 设置面板（自定义 modal）
+    const modal = $('#cfg');
+    $('#btnSettings').addEventListener('click', ()=>{ modal.style.display='grid'; });
+    function closeModal(){ modal.style.display='none'; }
+    modal.addEventListener('click', (e)=>{ if(e.target===modal) closeModal(); });
+    $('#saveBg').addEventListener('click', ()=>{ const v = $('#bgInput').value.trim(); localStorage.setItem('guess_bg_url', v); applyBg(v); closeModal();});
+    $('#clearBg').addEventListener('click', ()=>{ localStorage.removeItem('guess_bg_url'); applyBg(''); $('#bgInput').value=''; closeModal(); });
+
+    // iOS/微信对 AudioContext 的限制：在首次点击按钮后再解锁（如果未来加音效）
 
     // ============ 初始化 ============
     function init(){
       initBg();
-      const best = localStorage.getItem(bestKey); if(best) dom.best.textContent = best; else dom.best.textContent = '-';
+      const best = localStorage.getItem('guess_best_1_100'); if(best) $('#best').textContent = best; else $('#best').textContent = '-';
       newGame();
     }
     init();
