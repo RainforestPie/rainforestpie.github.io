@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"rainforestpie.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"giscus","storage":true,"lazyload":true,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="鹊桥相会 · 七夕小游戏           :root {       --fg: #f7f7f8;       --muted: #c8c8d0;       --accent: #ff7bb4; &#x2F;* 粉 *&#x2F;       --accent2: #7bdfff; &#x2F;* 蓝 *&#x2F;       --danger: #ff6b6b;       --ok: #7be27b;">
+  <meta name="description" content="七夕猜数字 · 1~100           :root{       --fg:#f7f7f8; --muted:#c7c9d3; --bg:#0b0f1a; --glass:rgba(255,255,255,.07);       --pink:#ff7bb4; --blue:#7bdfff; --gold:#ffd166; --danger:#ff6b6b; --ok">
 <meta property="og:type" content="website">
 <meta property="og:title" content="阮今天">
 <meta property="og:url" content="https://rainforestpie.github.io/qixi/index.html">
 <meta property="og:site_name" content="阮今天">
-<meta property="og:description" content="鹊桥相会 · 七夕小游戏           :root {       --fg: #f7f7f8;       --muted: #c8c8d0;       --accent: #ff7bb4; &#x2F;* 粉 *&#x2F;       --accent2: #7bdfff; &#x2F;* 蓝 *&#x2F;       --danger: #ff6b6b;       --ok: #7be27b;">
+<meta property="og:description" content="七夕猜数字 · 1~100           :root{       --fg:#f7f7f8; --muted:#c7c9d3; --bg:#0b0f1a; --glass:rgba(255,255,255,.07);       --pink:#ff7bb4; --blue:#7bdfff; --gold:#ffd166; --danger:#ff6b6b; --ok">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2025-08-29T08:28:55.293Z">
-<meta property="article:modified_time" content="2025-08-29T08:28:55.293Z">
+<meta property="article:published_time" content="2025-08-29T10:56:42.790Z">
+<meta property="article:modified_time" content="2025-08-29T10:56:42.790Z">
 <meta property="article:author" content="rainforest pie">
 <meta name="twitter:card" content="summary">
 
@@ -196,500 +196,338 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>鹊桥相会 · 七夕小游戏</title>
-  <meta name="description" content="一个无需资源、可直接部署到 GitHub Pages/Hexo/Jekyll 的七夕小游戏。" />
+  <title>七夕猜数字 · 1~100</title>
+  <meta name="description" content="一个外观清爽、可自定义背景图的 1~100 猜数字小游戏（七夕版），适合部署在 GitHub Pages/Hexo/Jekyll 上。" />
   <style>
-    :root {
-      --fg: #f7f7f8;
-      --muted: #c8c8d0;
-      --accent: #ff7bb4; /* 粉 */
-      --accent2: #7bdfff; /* 蓝 */
-      --danger: #ff6b6b;
-      --ok: #7be27b;
-      --bg: #0b0f1a; /* 夜空 */
-      --bg2: #101629; /* 银河 */
-      --panel: rgba(255,255,255,.06);
+    :root{
+      --fg:#f7f7f8; --muted:#c7c9d3; --bg:#0b0f1a; --glass:rgba(255,255,255,.07);
+      --pink:#ff7bb4; --blue:#7bdfff; --gold:#ffd166; --danger:#ff6b6b; --ok:#7be27b;
+      --bg-img:""; /* 你可以通过 JS/设置面板/URL 参数 ?bg= 来设置 */
     }
     html,body{height:100%;}
     body{
-      margin:0; background: radial-gradient(120vw 80vh at 50% -10%, #1b2444 0%, var(--bg) 45%, #02050b 100%);
-      color:var(--fg); font-family: system-ui, -apple-system, Segoe UI, Roboto, Noto Sans SC, Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-      overflow:hidden;
+      margin:0; color:var(--fg); font-family: system-ui, -apple-system, Segoe UI, Roboto, Noto Sans SC, Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: radial-gradient(120vw 80vh at 50% -10%, #1b2444 0%, var(--bg) 45%, #02050b 100%);
+      overflow:hidden; position:relative;
     }
-    #wrap{position:relative; width:100vw; height:100vh;}
-    canvas{position:absolute; inset:0; width:100%; height:100%; display:block;}
+    /* 背景图层（可配置） */
+    .bg-img{position:absolute; inset:0; background-size:cover; background-position:center; filter:brightness(.8) saturate(1.1); opacity:.35;}
+    .bg-overlay{position:absolute; inset:0; background:radial-gradient(120vw 80vh at 50% -10%, rgba(27,36,68,.7), rgba(2,5,11,.92) 60%);} 
 
-    /* HUD */
-    .hud{position:absolute; left:0; right:0; top:0; display:flex; gap:.75rem; align-items:center; padding:10px 12px; backdrop-filter: blur(6px);}
-    .chip{background:var(--panel); border:1px solid rgba(255,255,255,.07); border-radius:999px; padding:6px 12px; font-size:14px;}
-    .bar{flex:1; height:10px; background:linear-gradient(90deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); border:1px solid rgba(255,255,255,.08); border-radius:999px; overflow:hidden;}
-    .bar > i{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--accent), var(--accent2)); transition:width .15s ease-out;}
-    .btns{position:absolute; right:10px; top:10px; display:flex; gap:8px;}
-    .btn{background:var(--panel); border:1px solid rgba(255,255,255,.08); color:var(--fg); padding:6px 10px; border-radius:10px; cursor:pointer; font-size:14px;}
-    .btn:hover{background:rgba(255,255,255,.1)}
+    /* 星点装饰 */
+    .stars{position:absolute; inset:0; pointer-events:none;}
+    .stars i{position:absolute; border-radius:50%; background:#fff; opacity:.7; animation: twinkle 3s infinite ease-in-out alternate;}
+    @keyframes twinkle{ from{ opacity:.3; transform:scale(.8) } to{ opacity:1; transform:scale(1) } }
 
-    /* 中心面板 */
-    .overlay{position:absolute; inset:0; display:grid; place-items:center; pointer-events:none;}
-    .panel{pointer-events:auto; width:min(520px, 90vw); background:rgba(16,22,41,.72); border:1px solid rgba(255,255,255,.12); border-radius:16px; padding:20px; box-shadow:0 10px 40px rgba(0,0,0,.35)}
-    h1{margin:.2rem 0 0.25rem; font-weight:800; font-size:clamp(28px, 4vw, 42px); letter-spacing:1px;}
-    .subtitle{margin:0 0 10px; color:var(--muted)}
+    /* 容器 */
+    .wrap{position:relative; width:100vw; height:100vh; display:grid; place-items:center;}
+
+    .card{width:min(640px, 92vw); background:rgba(16, 22, 41, .72); border:1px solid rgba(255,255,255,.12); border-radius:18px; padding:20px 18px; box-shadow:0 10px 40px rgba(0,0,0,.35);}
+    h1{margin:.3rem 0 .2rem; font-size: clamp(28px, 4vw, 40px); letter-spacing:.5px}
+    .sub{margin:0 0 10px; color:var(--muted)}
+
     .row{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
-    .panel .btn{font-size:16px; padding:10px 14px; border-radius:12px}
-    .kbd{font:12px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); padding:2px 6px; border-radius:6px;}
-    .muted{color:var(--muted); font-size:14px}
-    .score{font-size:32px; font-weight:800;}
 
-    /* 移动端提示 */
-    .touch{position:absolute; left:50%; bottom:18px; transform:translateX(-50%); color:var(--muted); font-size:13px}
+    .hud{display:flex; gap:10px; align-items:center; justify-content:space-between; margin:6px 0 12px}
+    .chip{background:var(--glass); border:1px solid rgba(255,255,255,.06); border-radius:999px; padding:6px 10px; font-size:14px}
+
+    .field{display:flex; align-items:center; gap:8px}
+    .input{flex:1; display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); border-radius:12px; padding:10px 12px}
+    .input input{flex:1; border:none; outline:none; background:transparent; color:var(--fg); font-size:18px}
+    .btn{background:linear-gradient(90deg, var(--pink), var(--blue)); color:#161a2a; font-weight:700; border:none; padding:11px 14px; border-radius:12px; cursor:pointer; box-shadow:0 4px 20px rgba(255,123,180,.25);}
+    .btn:active{transform:translateY(1px)}
+    .btn.alt{background:var(--glass); color:var(--fg); border:1px solid rgba(255,255,255,.12); box-shadow:none}
+
+    .status{margin:10px 0 6px; min-height:26px; font-size:16px}
+    .status b{font-weight:800}
+    .history{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px}
+    .tag{padding:4px 8px; border-radius:999px; font-size:13px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1)}
+
+    .rangeBar{height:10px; background:linear-gradient(90deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); border:1px solid rgba(255,255,255,.08); border-radius:999px; overflow:hidden; margin:10px 0 2px}
+    .rangeBar i{display:block; height:100%; width:100%}
+    .rangeLabel{color:var(--muted); font-size:13px}
+
+    .footer{display:flex; gap:8px; flex-wrap:wrap; justify-content:space-between; margin-top:12px}
+    .left{display:flex; gap:8px; align-items:center}
+    .right{display:flex; gap:8px}
+
+    /* 获胜浮层 */
+    .overlay{position:fixed; inset:0; display:none; place-items:center;}
+    .panel{width:min(560px, 90vw); text-align:center; background:rgba(16,22,41,.85); border:1px solid rgba(255,255,255,.12); border-radius:18px; padding:20px; box-shadow:0 12px 50px rgba(0,0,0,.5)}
+    .score{font-size:34px; font-weight:900}
+    .poem{margin:8px auto 0; font-size:16px; color:#ffe5f1}
+    .author{color:#f9f9f9a6; font-size:14px; margin-top:4px}
+
+    /* 爱心烟花 */
+    .hearts{position:fixed; inset:0; pointer-events:none; overflow:hidden}
+    .hearts .h{position:absolute; width:14px; height:14px; transform:translate(-50%,-50%) rotate(45deg); animation:float 2.2s linear forwards;}
+    .hearts .h::before,.hearts .h::after{content:""; position:absolute; width:14px; height:14px; background:inherit; border-radius:50%}
+    .hearts .h::before{left:-7px}
+    .hearts .h::after{top:-7px}
+    @keyframes float{0%{opacity:0; transform:translate(-50%,-50%) scale(.8) rotate(45deg)} 10%{opacity:1} 100%{opacity:0; transform:translate(-50%, -180%) scale(1.8) rotate(45deg)}}
+
+    /* 设置弹窗 */
+    dialog{background:rgba(16,22,41,.9); border:1px solid rgba(255,255,255,.12); color:var(--fg); border-radius:16px; padding:14px 16px}
+    dialog::backdrop{background:rgba(0,0,0,.5)}
+    .cfg-row{display:flex; gap:8px; align-items:center; margin:8px 0}
+    .cfg-row input{flex:1; padding:8px 10px; border-radius:10px; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.06); color:var(--fg)}
+    .hint{color:var(--muted); font-size:12px}
+
+    @media (max-width:480px){ .right{width:100%} }
   </style>
 </head>
 <body>
-  <div id="wrap">
-    <canvas id="bg"></canvas>
-    <canvas id="game"></canvas>
+  <div class="bg-img" id="bgImg"></div>
+  <div class="bg-overlay"></div>
+  <div class="stars" id="stars"></div>
 
-    <div class="hud">
-      <span class="chip">⏱️ <b id="time">60</b>s</span>
-      <div class="bar" title="鹊桥进度"><i id="progress" style="width:0%"></i></div>
-      <span class="chip">💖 <b id="score">0</b></span>
-      <span class="chip">🏆 <b id="best">0</b></span>
-      <div class="btns">
-        <button class="btn" id="btnPause">⏸ 暂停</button>
-        <button class="btn" id="btnShare">🔗 分享</button>
+  <div class="wrap">
+    <div class="card">
+      <h1>七夕猜数字 <span style="font-size:20px">· 1~100</span></h1>
+      <p class="sub">我心有数，你来猜猜？输入 <b>1~100</b> 的整数并提交，我会提示 <b>↑ 更大 / ↓ 更小</b>。猜对后会送上七夕爱情诗句或英文情话～</p>
+
+      <div class="hud">
+        <span class="chip">🎯 范围：<b id="rangeText">1 - 100</b></span>
+        <span class="chip">📝 次数：<b id="tries">0</b></span>
+        <span class="chip">🏆 最佳：<b id="best">-</b></span>
       </div>
-    </div>
 
-    <div class="overlay" id="overlay">
-      <div class="panel" id="panel-start">
-        <h1>鹊桥相会</h1>
-        <p class="subtitle">七夕特别·在流星雨中接住 <b>喜鹊羽</b> 与 <b>心心</b>，搭起鹊桥让牛郎织女相会！</p>
-        <ul class="muted" style="margin:.5rem 0 1rem; padding-left: 1.1rem;">
-          <li>键盘：<span class="kbd">←</span>/<span class="kbd">→</span> 或 <span class="kbd">A</span>/<span class="kbd">D</span> 移动；<span class="kbd">空格</span> 开始/暂停</li>
-          <li>手机：左右滑动或拖拽底部 <b>小船</b>（银河摆渡）来接物。</li>
-          <li>接住 <b>💖 心心</b> 和 <b>🪶 喜鹊羽</b> 得分并充能；小心 <b>⚡ 雷云</b> 扣时与清空连击。</li>
-        </ul>
-        <div class="row">
-          <button class="btn" id="btnStart">✨ 开始游戏</button>
-          <button class="btn" id="btnHow">📜 规则</button>
+      <div class="field">
+        <div class="input">
+          <span>🔢</span>
+          <input id="num" type="number" placeholder="输入 1~100" min="1" max="100" />
         </div>
+        <button class="btn" id="btnGuess">猜！</button>
+        <button class="btn alt" id="btnNew">新局</button>
       </div>
 
-      <div class="panel" id="panel-how" style="display:none;">
-        <h1>怎么玩？</h1>
-        <p class="muted">60 秒内尽量多地接住好物以提升 <b>鹊桥进度</b>。进度满格即提前胜利；时间耗尽则结算得分。</p>
-        <ul class="muted" style="margin:.5rem 0 1rem; padding-left: 1.1rem;">
-          <li>连击：连续接中会增加 <b>倍率</b>（×1 → ×2 → ×3）。碰到雷云将打断。</li>
-          <li>好物：💖 <b>+2 分，+2% 进度</b>；🪶 <b>+1 分，+1% 进度</b></li>
-          <li>雷云：⚡ <b>-5 秒</b>，并清空当前倍率</li>
-        </ul>
-        <div class="row">
-          <button class="btn" id="btnBack">返回</button>
+      <div class="status" id="status"></div>
+
+      <div class="rangeBar"><i id="rangeBar"></i></div>
+      <div class="rangeLabel">当前可能区间会随着你的判断逐渐缩小</div>
+
+      <div class="history" id="history"></div>
+
+      <div class="footer">
+        <div class="left">
+          <button class="btn alt" id="btnSettings">⚙️ 设置</button>
+          <button class="btn alt" id="btnShare">🔗 分享</button>
         </div>
-      </div>
-
-      <div class="panel" id="panel-over" style="display:none; text-align:center;">
-        <div class="score" id="final-score">0</div>
-        <p class="muted" id="final-result">结果</p>
-        <div class="row" style="justify-content:center; margin-top:8px;">
-          <button class="btn" id="btnRetry">再来一次</button>
-          <button class="btn" id="btnShare2">分享成绩</button>
-          <a class="btn" href="/" style="text-decoration:none;">返回首页</a>
+        <div class="right">
+          <a class="btn alt" href="/" style="text-decoration:none">返回首页</a>
         </div>
       </div>
     </div>
-
-    <div class="touch">提示：可用手指在底部左右拖动小船来接住掉落物</div>
   </div>
 
+  <!-- 获胜浮层 -->
+  <div class="overlay" id="overlay">
+    <div class="panel">
+      <div class="score" id="final">🎉 你用了 0 次猜中！</div>
+      <div class="poem" id="poem">两情若是久长时，又岂在朝朝暮暮。</div>
+      <div class="author" id="author">— 秦观《鹊桥仙》</div>
+      <div class="row" style="justify-content:center; margin-top:10px">
+        <button class="btn" id="again">再来一局</button>
+        <button class="btn alt" id="copy">复制文案</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="hearts" id="hearts"></div>
+
+  <!-- 设置弹窗 -->
+  <dialog id="cfg">
+    <h3 style="margin:0 0 6px">外观设置</h3>
+    <div class="cfg-row">
+      <label style="min-width:4em">背景图</label>
+      <input id="bgInput" placeholder="输入图片 URL（建议 https）" />
+    </div>
+    <div class="hint">可在地址后加参数 <code>?bg=图片URL</code>，或在此处设置。会自动保存到本地。</div>
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px">
+      <button class="btn alt" id="clearBg">清除</button>
+      <button class="btn" id="saveBg">保存</button>
+    </div>
+  </dialog>
+
   <script>
-  // ====== 工具 & 环境 ======
-  const DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-  const rand = (a, b) => a + Math.random() * (b - a);
-  const choice = arr => arr[(Math.random() * arr.length) | 0];
+    // ============ 小工具 ============
+    const $ = sel => document.querySelector(sel);
+    const $$ = sel => document.querySelectorAll(sel);
+    const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+    const qs = new URLSearchParams(location.search);
 
-  // 本地存档
-  const Store = {
-    get best(){ return +(localStorage.getItem('qixi_best')||0); },
-    set best(v){ localStorage.setItem('qixi_best', String(v)); }
-  };
-
-  // 画布
-  const bg = document.getElementById('bg');
-  const game = document.getElementById('game');
-  const ctxB = bg.getContext('2d');
-  const ctx = game.getContext('2d');
-  let W=0,H=0;
-  function resize(){
-    W = bg.width = game.width = Math.floor(window.innerWidth * DPR);
-    H = bg.height = game.height = Math.floor(window.innerHeight * DPR);
-    bg.style.width = game.style.width = '100%';
-    bg.style.height = game.style.height = '100%';
-    drawBackdrop(true);
-  }
-  window.addEventListener('resize', resize);
-
-  // ====== 背景：星空 & 银河 ======
-  let stars = [];
-  function initStars(){
-    stars = Array.from({length:180}, ()=>({
-      x: Math.random()*W, y: Math.random()*H, r: Math.random()*1.4 + .4, a: Math.random()*1, s: rand(.05, .3)
-    }));
-  }
-  function drawBackdrop(reset){
-    if(reset) initStars();
-    ctxB.clearRect(0,0,W,H);
-    // 银河淡带
-    const g = ctxB.createLinearGradient(W*.3,0, W*.7,H);
-    g.addColorStop(0, 'rgba(255,255,255,.06)');
-    g.addColorStop(.5, 'rgba(255,255,255,.12)');
-    g.addColorStop(1, 'rgba(255,255,255,.06)');
-    ctxB.fillStyle = g;
-    ctxB.fillRect(W*.28, 0, W*.44, H);
-
-    // 星星
-    for(const s of stars){
-      s.a += s.s; if(s.a>Math.PI*2) s.a = 0;
-      const twinkle = (Math.sin(s.a)+1)/2; // 0-1
-      ctxB.beginPath();
-      ctxB.fillStyle = `rgba(255,255,255,${.35 + .65*twinkle})`;
-      ctxB.arc(s.x, s.y, s.r * (0.7 + 0.6*twinkle), 0, Math.PI*2);
-      ctxB.fill();
-    }
-  }
-
-  // ====== 游戏状态 ======
-  const $score = document.getElementById('score');
-  const $best = document.getElementById('best');
-  const $time = document.getElementById('time');
-  const $prog = document.getElementById('progress');
-  const $overlay = document.getElementById('overlay');
-  const $panelStart = document.getElementById('panel-start');
-  const $panelHow = document.getElementById('panel-how');
-  const $panelOver = document.getElementById('panel-over');
-  const $finalScore = document.getElementById('final-score');
-  const $finalResult = document.getElementById('final-result');
-  const $btnStart = document.getElementById('btnStart');
-  const $btnHow = document.getElementById('btnHow');
-  const $btnBack = document.getElementById('btnBack');
-  const $btnRetry = document.getElementById('btnRetry');
-  const $btnPause = document.getElementById('btnPause');
-  const $btnShare = document.getElementById('btnShare');
-  const $btnShare2 = document.getElementById('btnShare2');
-
-  let running = false, paused = false, over = false;
-  let timer = 60; // 秒
-  let score = 0, combo = 0, progress = 0; // 0-100
-  let lastT = 0;
-
-  // 角色：小船（摆渡）
-  const boat = { x:0, y:0, w: 100, h: 14, vx:0 };
-
-  // 物体池：好物与雷云
-  const objects = []; // {x,y,r,type,vy}
-  const TYPES = { HEART: 'heart', FEATHER:'feather', STORM:'storm' };
-
-  function resetGame(){
-    score = 0; combo = 0; progress = 0; timer = 60;
-    running = true; paused = false; over = false;
-    lastT = performance.now();
-    objects.length = 0;
-    boat.w = Math.max(80, Math.min(160, W*0.12));
-    boat.h = Math.max(12, Math.min(20, H*0.016));
-    boat.x = W/2; boat.y = H - 60*DPR;
-    boat.vx = 0;
-    $score.textContent = '0';
-    $time.textContent = Math.ceil(timer);
-    setOverlay(null);
-  }
-
-  function setOverlay(which){
-    // which: 'start' | 'how' | 'over' | null
-    $overlay.style.display = which? 'grid' : 'none';
-    $panelStart.style.display = which==='start' ? 'block':'none';
-    $panelHow.style.display = which==='how' ? 'block':'none';
-    $panelOver.style.display = which==='over' ? 'block':'none';
-  }
-
-  function spawn(){
-    // 概率：心 45%，羽 40%，雷 15%
-    const t = Math.random();
-    const type = t < .45 ? TYPES.HEART : (t < .85 ? TYPES.FEATHER : TYPES.STORM);
-    const baseVy = H * 0.00035; // 速度基准（随屏幕高）
-    const vy = baseVy * rand(0.9, 1.8) * (1 + score*0.004);
-    const r = (type===TYPES.STORM) ? rand(16, 22)*DPR : rand(12, 18)*DPR;
-    objects.push({ x: rand(20*DPR, W-20*DPR), y: -30*DPR, r, type, vy });
-  }
-
-  // 命中判定：圆 vs 矩形
-  function hitCircleRect(cx, cy, cr, rx, ry, rw, rh){
-    const x = clamp(cx, rx, rx+rw);
-    const y = clamp(cy, ry, ry+rh);
-    const dx = cx - x, dy = cy - y;
-    return (dx*dx + dy*dy) <= cr*cr;
-  }
-
-  // 音效（纯 WebAudio 合成，避免外部资源）
-  const audioCtx = (window.AudioContext? new AudioContext() : null);
-  function beep(freq=440, dur=0.06, type='sine', gain=0.03){
-    if(!audioCtx) return;
-    const o = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    o.type = type; o.frequency.value = freq;
-    g.gain.value = gain;
-    o.connect(g).connect(audioCtx.destination);
-    o.start(); o.stop(audioCtx.currentTime + dur);
-  }
-
-  // 渲染
-  function drawBoat(){
-    // 船体
-    ctx.fillStyle = 'rgba(255,255,255,.9)';
-    const rx = boat.x - boat.w/2, ry = boat.y - boat.h/2;
-    roundRect(ctx, rx, ry, boat.w, boat.h, boat.h/2);
-    ctx.fill();
-    // 船头心形灯
-    heart(ctx, rx + boat.w*0.85, ry - boat.h*0.8, 8*DPR, '#ff7bb4');
-  }
-
-  function drawObjects(dt){
-    for(let i=objects.length-1;i>=0;i--){
-      const o = objects[i];
-      o.y += o.vy * dt;
-      if(o.y - 40*DPR > H){ objects.splice(i,1); continue; }
-
-      if(hitCircleRect(o.x, o.y, o.r, boat.x-boat.w/2, boat.y-boat.h/2, boat.w, boat.h)){
-        if(o.type===TYPES.HEART){
-          combo = Math.min(3, combo+1);
-          const add = 2 * combo;
-          score += add; progress = Math.min(100, progress + 2);
-          beep(880, .06, 'triangle', 0.035);
-        } else if(o.type===TYPES.FEATHER){
-          combo = Math.min(3, combo+1);
-          const add = 1 * combo;
-          score += add; progress = Math.min(100, progress + 1);
-          beep(740, .05, 'sine', 0.03);
-        } else { // 雷云
-          combo = 0; timer = Math.max(0, timer - 5);
-          beep(120, .12, 'square', 0.05);
-        }
-        objects.splice(i,1);
-        $score.textContent = score;
+    // ============ 星点生成 ============
+    (function starfield(){
+      const box = $('#stars');
+      const n = 120; const W = window.innerWidth; const H = window.innerHeight;
+      for(let i=0;i<n;i++){
+        const s = document.createElement('i');
+        const size = Math.random()*2.2 + .6;
+        s.style.width = s.style.height = size+'px';
+        s.style.left = Math.random()*100+'%';
+        s.style.top = Math.random()*100+'%';
+        s.style.opacity = (0.3+Math.random()*0.7).toFixed(2);
+        s.style.animationDuration = (2.5+Math.random()*3)+'s';
+        box.appendChild(s);
       }
+    })();
 
-      // 画
-      if(o.type===TYPES.HEART){ heart(ctx, o.x, o.y, o.r, '#ff7bb4'); }
-      else if(o.type===TYPES.FEATHER){ feather(ctx, o.x, o.y, o.r); }
-      else { storm(ctx, o.x, o.y, o.r); }
+    // ============ 背景图设置 ============
+    const bgKey = 'guess_bg_url';
+    function applyBg(url){
+      const el = $('#bgImg');
+      if(url){ el.style.backgroundImage = `url('${url.replace(/'/g, "%27")}')`; el.style.opacity = .42; }
+      else { el.style.backgroundImage = 'none'; el.style.opacity = .0; }
     }
-  }
-
-  function loop(t){
-    if(!running){ requestAnimationFrame(loop); return; }
-    const now = t || performance.now();
-    let dt = (now - lastT) / 16.67; // 约等于 帧数比例
-    dt = clamp(dt, 0, 2.5);
-    lastT = now;
-
-    if(!paused && !over){
-      // 时间推进
-      timer -= (dt/60);
-      if(timer <= 0) { timer = 0; gameOver(false); }
-
-      // 生成物体（随时间与分数略加快）
-      if(Math.random() < 0.04 * dt * (1 + score*0.002)) spawn();
-
-      // 移动船
-      boat.x = clamp(boat.x + boat.vx * dt, boat.w/2+8*DPR, W-boat.w/2-8*DPR);
+    const initBg = () => {
+      const byQS = qs.get('bg');
+      if(byQS){ localStorage.setItem(bgKey, byQS); applyBg(byQS); $('#bgInput').value = byQS; return; }
+      const saved = localStorage.getItem(bgKey);
+      if(saved){ applyBg(saved); $('#bgInput').value = saved; }
     }
 
-    // 背景闪烁
-    drawBackdrop();
+    // ============ 文案池（诗词 + 英文） ============
+    const LINES = [
+      {t:'两情若是久长时，又岂在朝朝暮暮。', a:'秦观《鹊桥仙》'},
+      {t:'在天愿作比翼鸟，在地愿为连理枝。', a:'白居易《长恨歌》'},
+      {t:'曾经沧海难为水，除却巫山不是云。', a:'元稹《离思》'},
+      {t:'衣带渐宽终不悔，为伊消得人憔悴。', a:'柳永《蝶恋花》'},
+      {t:'山无陵，江水为竭，冬雷震震，夏雨雪，天地合，乃敢与君绝。', a:'《上邪》'},
+      {t:'天阶夜色凉如水，卧看牵牛织女星。', a:'杜牧《秋夕》'},
+      {t:'玲珑骰子安红豆，入骨相思知不知。', a:'温庭筠《杨柳枝》'},
+      {t:'只愿君心似我心，定不负相思意。', a:'李之仪《卜算子》'},
+      {t:'海上生明月，天涯共此时。', a:'张九龄《望月怀远》'},
+      {t:'一日不见，如三秋兮。', a:'《诗经·王风·采葛》'},
 
-    // 清屏
-    ctx.clearRect(0,0,W,H);
+      {t:'Love looks not with the eyes, but with the mind.', a:'Shakespeare'},
+      {t:'Whatever our souls are made of, his and mine are the same.', a:'Emily Brontë'},
+      {t:'Shall I compare thee to a summer’s day? Thou art more lovely and more temperate.', a:'Shakespeare'},
+      {t:'Grow old along with me; the best is yet to be.', a:'Robert Browning'},
+      {t:'Love is composed of a single soul inhabiting two bodies.', a:'Aristotle'},
+      {t:'My heart is, and always will be, yours.', a:'Jane Austen (adapted)'}
+    ];
 
-    // 银河分隔两岸的剪影（牛郎织女）
-    drawSilhouettes();
+    // ============ 游戏状态 ============
+    const state = { secret: 0, tries: 0, lo: 1, hi: 100, over:false };
+    const bestKey = 'guess_best_1_100';
+    const dom = {
+      num: $('#num'), tries: $('#tries'), best: $('#best'), status: $('#status'),
+      rangeText: $('#rangeText'), rangeBar: $('#rangeBar'), history: $('#history'),
+      overlay: $('#overlay'), final: $('#final'), poem: $('#poem'), author: $('#author')
+    };
 
-    // 掉落物与判定
-    drawObjects(dt);
-
-    // 船
-    drawBoat();
-
-    // HUD 更新
-    $time.textContent = Math.ceil(timer);
-    $prog.style.width = progress + '%';
-
-    // 满格即胜利
-    if(progress >= 100 && !over){ gameOver(true); }
-
-    requestAnimationFrame(loop);
-  }
-
-  function gameOver(won){
-    over = true; running = false;
-    const best = Store.best = Math.max(Store.best, score);
-    $best.textContent = best;
-    $finalScore.textContent = `${score} 分`
-    $finalResult.textContent = won ? '🎉 鹊桥已成，牛郎织女相会成功！' : '💫 时光已尽，来年再试？';
-    setOverlay('over');
-  }
-
-  // ====== 形状绘制 ======
-  function roundRect(ctx, x,y,w,h,r){
-    const rr = Math.min(r, w/2, h/2);
-    ctx.beginPath();
-    ctx.moveTo(x+rr, y);
-    ctx.arcTo(x+w, y, x+w, y+h, rr);
-    ctx.arcTo(x+w, y+h, x, y+h, rr);
-    ctx.arcTo(x, y+h, x, y, rr);
-    ctx.arcTo(x, y, x+w, y, rr);
-    ctx.closePath();
-  }
-
-  function heart(ctx, x,y, r, color){
-    ctx.save();
-    ctx.translate(x,y); ctx.scale(r/10, r/10);
-    ctx.beginPath();
-    ctx.moveTo(0,4);
-    ctx.bezierCurveTo(0,2, -2,0, -4,0);
-    ctx.bezierCurveTo(-7,0, -7,4, -7,4);
-    ctx.bezierCurveTo(-7,7, -4,9, 0,12);
-    ctx.bezierCurveTo(4,9, 7,7, 7,4);
-    ctx.bezierCurveTo(7,4, 7,0, 4,0);
-    ctx.bezierCurveTo(2,0, 0,2, 0,4);
-    ctx.closePath();
-    const g = ctx.createLinearGradient(-8,-2,8,14);
-    g.addColorStop(0, color||'#ff7bb4');
-    g.addColorStop(1, '#ffd1e6');
-    ctx.fillStyle = g; ctx.fill();
-    ctx.restore();
-  }
-
-  function feather(ctx, x,y, r){
-    ctx.save();
-    ctx.translate(x,y); ctx.rotate((Math.sin(x*0.01+y*0.01)+1)*0.2);
-    const w = r*1.8, h=r*4;
-    const g = ctx.createLinearGradient(0,-h/2,0,h/2);
-    g.addColorStop(0, '#d9f3ff'); g.addColorStop(1, '#7bdfff');
-    ctx.fillStyle = g;
-    ctx.beginPath();
-    ctx.moveTo(0,-h/2);
-    ctx.quadraticCurveTo(w/2,-h/3, 0, h/2);
-    ctx.quadraticCurveTo(-w/2,-h/3, 0,-h/2);
-    ctx.fill();
-    // 叶脉
-    ctx.strokeStyle = 'rgba(0,0,0,.15)'; ctx.lineWidth = DPR;
-    ctx.beginPath(); ctx.moveTo(0,-h/2); ctx.lineTo(0,h/2); ctx.stroke();
-    ctx.restore();
-  }
-
-  function storm(ctx, x,y, r){
-    ctx.save(); ctx.translate(x,y);
-    // 云
-    ctx.fillStyle = '#3e4a62';
-    for(let i=0;i<4;i++){
-      ctx.beginPath(); ctx.arc((i-1.5)*r*0.8, -r*0.2*Math.sin(i), r*0.65 + (i%2)*1.6, 0, Math.PI*2); ctx.fill();
+    function newGame(){
+      state.secret = 1 + Math.floor(Math.random()*100);
+      state.tries = 0; state.lo = 1; state.hi = 100; state.over=false;
+      dom.num.value = '';
+      dom.status.textContent = '';
+      dom.tries.textContent = '0';
+      dom.rangeText.textContent = '1 - 100';
+      dom.rangeBar.style.background = `linear-gradient(90deg, transparent 0%, transparent 0%, rgba(255,255,255,.22) 0%, rgba(255,255,255,.22) 100%, transparent 100%)`;
+      dom.history.innerHTML = '';
+      hideOverlay();
+      dom.num.focus();
     }
-    // 闪电
-    ctx.strokeStyle = '#ffd166'; ctx.lineWidth = r*0.25; ctx.lineCap='square';
-    ctx.beginPath(); ctx.moveTo(-r*0.2,0); ctx.lineTo(0,r*0.9); ctx.lineTo(-r*0.1,r*0.9); ctx.stroke();
-    ctx.restore();
-  }
 
-  function drawSilhouettes(){
-    const margin = 20*DPR; const ground = H - 24*DPR;
-    // 左岸（织女）
-    ctx.fillStyle = 'rgba(0,0,0,.55)';
-    ctx.beginPath(); ctx.moveTo(0,ground); ctx.lineTo(W*0.25, ground-40*DPR); ctx.lineTo(W*0.25, ground); ctx.closePath(); ctx.fill();
-    // 右岸（牛郎）
-    ctx.beginPath(); ctx.moveTo(W,ground); ctx.lineTo(W*0.75, ground-38*DPR); ctx.lineTo(W*0.75, ground); ctx.closePath(); ctx.fill();
-
-    // 两端小人影（极简）
-    // 左
-    dotPerson(W*0.2, ground-46*DPR);
-    // 右
-    dotPerson(W*0.8, ground-44*DPR);
-  }
-  function dotPerson(x,y){
-    ctx.save(); ctx.translate(x,y);
-    ctx.fillStyle = 'rgba(0,0,0,.6)';
-    ctx.beginPath(); ctx.arc(0,-6*DPR, 4*DPR, 0, Math.PI*2); ctx.fill();
-    ctx.fillRect(-3*DPR, -6*DPR, 6*DPR, 12*DPR);
-    ctx.restore();
-  }
-
-  // ====== 输入 ======
-  const keys = new Set();
-  window.addEventListener('keydown', (e)=>{
-    if(e.code==='Space'){ togglePauseOrStart(); }
-    keys.add(e.code);
-    updateVX();
-    // 解锁音频
-    if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-  });
-  window.addEventListener('keyup', (e)=>{ keys.delete(e.code); updateVX(); });
-
-  function updateVX(){
-    const left = keys.has('ArrowLeft') || keys.has('KeyA');
-    const right = keys.has('ArrowRight') || keys.has('KeyD');
-    const speed = Math.max(3.8, Math.min(8.5, W*0.0045));
-    boat.vx = (left? -speed:0) + (right? speed:0);
-  }
-
-  // 触摸/拖拽
-  let dragging = false;
-  function pointer(e){
-    const rect = game.getBoundingClientRect();
-    const x = (e.touches? e.touches[0].clientX : e.clientX) - rect.left;
-    boat.x = clamp(x * DPR, boat.w/2+8*DPR, W-boat.w/2-8*DPR);
-  }
-  game.addEventListener('pointerdown', e=>{ dragging=true; pointer(e); });
-  game.addEventListener('pointermove', e=>{ if(dragging) pointer(e); });
-  window.addEventListener('pointerup', ()=> dragging=false);
-  game.addEventListener('touchstart', e=>{ dragging=true; pointer(e); }, {passive:true});
-  game.addEventListener('touchmove', e=>{ if(dragging) pointer(e); }, {passive:true});
-  window.addEventListener('touchend', ()=> dragging=false);
-
-  // ====== 控件 ======
-  function togglePauseOrStart(){
-    if(!running && !over){ start(); return; }
-    if(over) return;
-    paused = !paused; document.getElementById('btnPause').textContent = paused? '▶️ 继续':'⏸ 暂停';
-  }
-
-  function start(){
-    resetGame();
-    requestAnimationFrame(loop);
-  }
-
-  function share(){
-    const text = `我在『鹊桥相会』拿到了 ${score} 分！来试试？`; 
-    const url = location.href.split('#')[0];
-    if(navigator.share){ navigator.share({title:'鹊桥相会 · 七夕小游戏', text, url}); }
-    else{
-      const payload = `${text} \n${url}`;
-      navigator.clipboard?.writeText(payload);
-      alert('已复制分享文案到剪贴板，快去粘贴给 TA 吧！');
+    function updateRangeBar(){
+      const start = (state.lo-1)/100*100; const end = (state.hi)/100*100;
+      dom.rangeBar.style.background = `linear-gradient(90deg, transparent ${start}%, rgba(255,255,255,.22) ${start}%, rgba(255,255,255,.22) ${end}%, transparent ${end}%)`;
     }
-  }
 
-  // ====== 事件绑定 ======
-  document.getElementById('best').textContent = Store.best;
-  $btnStart.onclick = ()=> start();
-  $btnHow.onclick = ()=> setOverlay('how');
-  $btnBack.onclick = ()=> setOverlay('start');
-  $btnRetry.onclick = ()=> { setOverlay(null); start(); };
-  $btnPause.onclick = ()=> togglePauseOrStart();
-  $btnShare.onclick = ()=> share();
-  $btnShare2.onclick = ()=> share();
+    function addHistory(n){
+      const el = document.createElement('span');
+      el.className = 'tag';
+      el.textContent = n;
+      dom.history.prepend(el);
+    }
 
-  // 初始
-  resize(); setOverlay('start'); drawBackdrop(true);
-  requestAnimationFrame(loop);
+    function guess(){
+      if(state.over) return;
+      const v = parseInt(dom.num.value, 10);
+      if(isNaN(v) || v<1 || v>100){
+        dom.status.innerHTML = '⚠️ 请输入 <b>1~100</b> 的整数。';
+        dom.num.select(); return;
+      }
+      state.tries++; dom.tries.textContent = state.tries;
+      addHistory(v);
 
+      if(v === state.secret){
+        win();
+      } else if(v < state.secret){
+        state.lo = Math.max(state.lo, v+1);
+        dom.status.innerHTML = '↗️ 再大一点！';
+      } else {
+        state.hi = Math.min(state.hi, v-1);
+        dom.status.innerHTML = '↘️ 再小一点！';
+      }
+      dom.rangeText.textContent = `${state.lo} - ${state.hi}`;
+      updateRangeBar();
+      dom.num.select();
+    }
+
+    function win(){
+      state.over = true;
+      const best = +localStorage.getItem(bestKey) || Infinity;
+      if(state.tries < best){ localStorage.setItem(bestKey, state.tries); }
+      dom.best.textContent = localStorage.getItem(bestKey) || '-';
+
+      // 随机文案
+      const pick = LINES[Math.floor(Math.random()*LINES.length)];
+      dom.final.textContent = `🎉 你用了 ${state.tries} 次猜中！`;
+      dom.poem.textContent = pick.t; dom.author.textContent = '— ' + pick.a;
+      showOverlay();
+      boomHearts(26);
+    }
+
+    function showOverlay(){ dom.overlay.style.display = 'grid'; }
+    function hideOverlay(){ dom.overlay.style.display = 'none'; }
+
+    // ============ 爱心动画 ============
+    function boomHearts(n=20){
+      const box = $('#hearts');
+      for(let i=0;i<n;i++){
+        const d = document.createElement('div'); d.className='h';
+        const hue = 330 + Math.random()*40; // 粉系
+        d.style.background = `hsl(${hue}, 85%, 70%)`;
+        d.style.left = (50 + (Math.random()*40-20)) + '%';
+        d.style.top = (50 + (Math.random()*20-10)) + '%';
+        d.style.animationDuration = (1.8+Math.random()*1.2)+'s';
+        box.appendChild(d);
+        setTimeout(()=> d.remove(), 2400);
+      }
+    }
+
+    // ============ 事件绑定 ============
+    $('#btnGuess').addEventListener('click', guess);
+    $('#btnNew').addEventListener('click', newGame);
+    $('#again').addEventListener('click', ()=>{ newGame(); hideOverlay(); });
+    $('#copy').addEventListener('click', ()=>{
+      const txt = `${dom.final.textContent}\n${dom.poem.textContent}\n${dom.author.textContent}`;
+      navigator.clipboard?.writeText(txt); alert('已复制，快去分享吧！');
+    });
+    $('#btnShare').addEventListener('click', ()=>{
+      const url = location.href.split('#')[0];
+      const text = `我在玩「七夕猜数字（1~100）」！你能比我更快猜中吗？`;
+      if(navigator.share){ navigator.share({title:document.title, text, url}); }
+      else{ navigator.clipboard?.writeText(`${text}\n${url}`); alert('已复制分享文案到剪贴板'); }
+    });
+
+    // 回车提交
+    $('#num').addEventListener('keydown', e=>{ if(e.key==='Enter') guess(); });
+
+    // 设置面板
+    const cfg = $('#cfg');
+    $('#btnSettings').addEventListener('click', ()=> cfg.showModal());
+    $('#saveBg').addEventListener('click', ()=>{ const v = $('#bgInput').value.trim(); localStorage.setItem(bgKey, v); applyBg(v); cfg.close();});
+    $('#clearBg').addEventListener('click', ()=>{ localStorage.removeItem(bgKey); applyBg(''); $('#bgInput').value=''; cfg.close(); });
+
+    // ============ 初始化 ============
+    function init(){
+      initBg();
+      const best = localStorage.getItem(bestKey); if(best) dom.best.textContent = best; else dom.best.textContent = '-';
+      newGame();
+    }
+    init();
   </script>
 </body>
 </html>
@@ -754,7 +592,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#panel-start"><span class="nav-number">1.</span> <span class="nav-text">鹊桥相会</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#panel-how"><span class="nav-number">2.</span> <span class="nav-text">怎么玩？</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">1.</span> <span class="nav-text">七夕猜数字 · 1~100</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#cfg"><span class="nav-number">1.0.1.</span> <span class="nav-text">外观设置</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
